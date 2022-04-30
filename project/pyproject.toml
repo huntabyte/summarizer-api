@@ -10,10 +10,22 @@ fastapi = "0.70.1"
 uvicorn = "0.16.0"
 asyncpg = "0.25.0"
 tortoise-orm = "0.17.8"
+aerich = "0.6.1"
+gunicorn = "20.1.0"
+pytest-cov = "3.0.0"
+flake8 = "4.0.1"
+isort = "5.10.1"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "6.2.5"
+requests = "2.26.0"
 black = "^22.3.0"
+
+
+[tool.aerich]
+tortoise_orm = "app.db.TORTOISE_ORM"
+location = "./migrations"
+src_folder = "./."
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

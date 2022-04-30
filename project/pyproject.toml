@@ -8,6 +8,8 @@ authors = ["Hunter Johnston <johnstonhuntera@gmail.com>"]
 python = "^3.9"
 fastapi = "0.70.1"
 uvicorn = "0.16.0"
+asyncpg = "0.25.0"
+tortoise-orm = "0.17.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

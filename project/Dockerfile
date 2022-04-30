@@ -26,3 +26,10 @@ RUN poetry config virtualenvs.create false \
 
 # add app
 COPY . .
+
+# add entrypoint.sh
+COPY ./entrypoint.sh .
+RUN chmod +x /usr/src/app/entrypoint.sh
+
+# run entrypoint
+ENTRYPOINT [ "/usr/src/app/entrypoint.sh" ]

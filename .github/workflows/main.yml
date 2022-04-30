@@ -79,3 +79,46 @@ jobs:
         run: docker exec fastapi-tdd python -m black . --check
       - name: isort
         run: docker exec fastapi-tdd python -m isort . --check-only
+
+  deploy:
+    name: Deploy to Heroku
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    env:
+      HEROKU_APP_NAME: arcane-everglades-91209
+      HEROKU_REGISTRY_IMAGE: registry.heroku.com${HEROKU_APP_NAME}/summarizer
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          ref: main
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull Image
+        run: |
+          docker pull ${{ env.IMAGE }}:latest || true
+      - name: Build Image
+        run: |
+          docker build \
+          --cache-from ${{ env.IMAGE }}:latest \
+          --tag ${{ env.HEROKU_REGISTRY_IMAGE }}:latest \
+          --file ./project/Dockerfile.prod \
+          "./project"
+      - name: Login to Heroku Container Registry
+        run: docker login -u _ -p ${HEROKU_AUTH_TOKEN} registry.heroku.com
+        env:
+          HEROKU_AUTH_TOKEN: ${{ secrets.HEROKU_AUTH_TOKEN }}
+      - name: Push to the registry
+        run: docker push ${{ env.HEROKU_REGISTRY_IMAGE }}
+      - name: Set Environment Variables
+        run: |
+          echo "HEROKU_REGISTRY_IMAGE=${{ env.HEROKU_REGISTRY_IMAGE }}" >> $GITHUB_ENV
+          echo "HEROKU_AUTH_TOKEN=${{ secrets.HEROKU_AUTH_TOKEN }}" >> $GITHUB_ENV
+      - name: Release
+        run: |
+          chmod +x ./release.sh
+          ./release.sh

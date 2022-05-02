@@ -18,11 +18,9 @@ RUN apt-get update \
 
 # install python dependencies
 RUN pip install --upgrade pip
-COPY ./pyproject.toml .
-COPY ./poetry.lock .
-RUN pip install poetry
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-ansi --no-interaction
+COPY ./requirements.txt .
+COPY ./requirements-dev.txt .
+RUN pip install -r requirements-dev.txt
 
 # add app
 COPY . .
